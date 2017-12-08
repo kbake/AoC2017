@@ -1452,12 +1452,36 @@ find_bottom(test_input)
 find_bottom(main_input)
 
 # Part 2
+class Thingy:
+  def __init__(self, name, weight, children):
+    self.name = name
+    self.weight = weight
+    self.child_names = [name.strip() for name in children]
+    self.owner_name = None
+    self.children = None
+    self.owner = None
+  
+  def set_owner(self, owner):
+    self.owner = owner
+  
+  def add_child(self, child):
+    self.children.append(child)
+  
 def find_weight_adjustment(input_str):
   nodes = []
   for item in input_str.split('\n'):
     split_item = item.split()
-    node = (split_item[0], int(split_item[1].strip("()")))
-    nodes.append(node)
-  for item in [x.split("-> ")[1] for x in input_str.split('\n') if "->" in x]:
-    print(item.split(', '))
+    name = split_item[0]
+    weight = int(split_item[1].strip("()"))
+    children = []
+    if len(split_item) > 2:
+      print(item)
+      print(item.split("->"))
+      children = [child.strip() for child in item.split("->")[1].split(', ')]
+    thing = Thingy(name, weight, children)
+    nodes.append(thing)
+  print(nodes[0].name)
+  
+  # for item in [x.split("-> ")[1] for x in input_str.split('\n') if "->" in x]:
+  #   print(item.split(', '))
 find_weight_adjustment(test_input)

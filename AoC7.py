@@ -1448,8 +1448,8 @@ def find_bottom(input_str):
   [names_list.remove(hold) for hold in holding_list if hold in names_list]
   print(names_list)
   return names_list[0]
-find_bottom(test_input)
-find_bottom(main_input)
+test_bottom = find_bottom(test_input)
+main_bottom = find_bottom(main_input)
 
 # Part 2
 class Thingy:
@@ -1458,7 +1458,7 @@ class Thingy:
     self.weight = weight
     self.child_names = [name.strip() for name in children]
     self.owner_name = None
-    self.children = None
+    self.children = []
     self.owner = None
   
   def set_owner(self, owner):
@@ -1466,8 +1466,28 @@ class Thingy:
   
   def add_child(self, child):
     self.children.append(child)
-  
-def find_weight_adjustment(input_str):
+
+def build_tree(cur_node, available_nodes, level):
+  for child_name in cur_node.child_names:
+    for node in available_nodes:
+      if node.name == child_name:
+        cur_node.children.append(node)
+        available_nodes.remove(node)
+  branch_weights = []
+  for child in cur_node.children:
+    weight = child.weight + cur_node.weight
+    for child_name in child.child_names:
+      for node in available_nodes:
+        if node.name == child_name:
+          child.children.append(node)
+          available_nodes.remove(node)
+    for child_node in child.children:
+      weight += build_tree(child_node, available_nodes, level+1)
+    branch_weights.append(weight)
+  print(str(level) + ": " + str(branch_weights))
+  return sum(branch_weights)
+
+def find_weight_adjustment(input_str, bottom):
   nodes = []
   for item in input_str.split('\n'):
     split_item = item.split()
@@ -1475,13 +1495,13 @@ def find_weight_adjustment(input_str):
     weight = int(split_item[1].strip("()"))
     children = []
     if len(split_item) > 2:
-      print(item)
-      print(item.split("->"))
       children = [child.strip() for child in item.split("->")[1].split(', ')]
     thing = Thingy(name, weight, children)
     nodes.append(thing)
-  print(nodes[0].name)
+  root = [x for x in nodes if x.name == bottom][0]
+  build_tree(root, nodes, 1)
   
   # for item in [x.split("-> ")[1] for x in input_str.split('\n') if "->" in x]:
   #   print(item.split(', '))
-find_weight_adjustment(test_input)
+find_weight_adjustment(test_input, test_bottom)
+find_weight_adjustment(main_input, main_bottom)
